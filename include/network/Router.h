@@ -151,10 +151,17 @@ private:
 /*HTTP action for response from server, overload do func to perform action to response*/
 class NETWORK_API Action {
 public:
-    Action() {}
+    Action(): progressInterval(0.1), lastTime(0) {}
     virtual void Do(const Http::Task& task) = 0;
     virtual int Progress(double totaltime, double dltotal, double dlnow, double ultotal, double ulnow, const Http::Task& task) = 0;
     ~Action() {}
+    float ProgressInterval() const { return progressInterval; }
+    void ProgressInterval(float val) { progressInterval = val; }
+    float LastTime() const { return lastTime; }
+    void LastTime(float val) { lastTime = val; }
+private:
+    float progressInterval;
+    float lastTime;
 };
 
 class  Router {

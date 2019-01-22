@@ -291,7 +291,12 @@ static int xferinfo(void* p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
     if (task->Dltotal() == 0 && dltotal != 0) {
         task->Dltotal(dltotal);
     }
-    return task->Action()->Progress(curtime, (double)dltotal, (double)dlnow, ultotal, ulnow, *task);
+    if (curtime - task->Action()->LastTime() >= task->Action()->ProgressInterval()) {
+        task->Action()->LastTime(curtime);
+        return task->Action()->Progress(curtime, (double)dltotal, (double)dlnow, ultotal, ulnow, *task);
+
+    }
+    return 0;
 }
 
 static int older_progress(void* p, double dltotal, double dlnow, double ultotal, double ulnow) {
