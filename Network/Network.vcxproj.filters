@@ -27,10 +27,10 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Router.h">
+    <ClInclude Include="..\include\network\Router.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="Url.h">
+    <ClInclude Include="..\include\network\Url.h">
       <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
