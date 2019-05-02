@@ -54,30 +54,30 @@ Memory::~Memory() {
     MemoryAddr(0);
 }
 
-Request::Request(const URL& url, void* userData) : url(url), userData(userData), unhandled(true), uploadeddatas(), type(TYPE::GET) {
+Request::Request(const URL& url, Base* userData) : url(url), userData(userData), unhandled(true), updDatas(), type(TYPE::GET) {
 }
 
-Request::Request(const URL& url, const std::vector<UploadedData>& uploadeddatas, void* userData /*= nullptr*/)
-    : url(url), uploadeddatas(uploadeddatas), userData(userData), type(TYPE::POST) {
+Request::Request(const URL& url, const std::vector<UploadedData>& uploadeddatas, Base* userData /*= nullptr*/)
+    : url(url), updDatas(uploadeddatas), userData(userData), type(TYPE::POST) {
 
 }
 
 Request::Request(const Request& request)
     : url(request.Url()), userData(request.UserData()),
-      unhandled(request.Unhandled()), uploadeddatas(request.uploadeddatas), type(request.type) {
+      unhandled(request.Unhandled()), updDatas(request.updDatas), type(request.type) {
 }
 
 
 Request::Request(Request&& request)
     : url(std::move(request.url)), userData(request.userData),
-      unhandled(request.unhandled), uploadeddatas(std::move(request.uploadeddatas)), type(request.type) {
+      unhandled(request.unhandled), updDatas(std::move(request.updDatas)), type(request.type) {
     request.UserData(nullptr);
 }
 
 
 
 bool Request::operator==(const Request& request) const {
-    return url == request.url && unhandled == request.unhandled && userData == request.userData && uploadeddatas == request.uploadeddatas && type == request.Type();
+    return url == request.url && unhandled == request.unhandled && userData == request.userData && updDatas == request.updDatas && type == request.Type();
 }
 
 Request::~Request() {
@@ -109,18 +109,18 @@ bool Request::Unhandled() const {
 }
 
 
-void* Request::UserData() const {
+Base* Request::UserData() const {
     return userData;
 }
 
 
-void Request::UserData(void* val) {
+void Request::UserData(Base* val) {
     userData = val;
 }
 
 
 std::vector<Http::UploadedData>& Request::Uploadeddatas() {
-    return uploadeddatas;
+    return updDatas;
 }
 
 
@@ -204,11 +204,11 @@ Task::Task(const Task& task) : Request(task), Response(task),
 }
 
 
-Task::Task(const URL& url, Http::Action* action, void* userdata /*= nullptr*/) : Request(url, userdata), Response(), action(action), mark(Task::markCouter++) {
+Task::Task(const URL& url, Http::Action* action, Base* userdata /*= nullptr*/) : Request(url, userdata), Response(), action(action), mark(Task::markCouter++) {
 
 }
 
-Task::Task(const URL& url, const std::vector<UploadedData>& uploadData, Http::Action* action, void* userData /*= nullptr*/) : Request(url, uploadData, userData), action(action), mark(Task::markCouter++) {
+Task::Task(const URL& url, const std::vector<UploadedData>& uploadData, Http::Action* action, Base* userData /*= nullptr*/) : Request(url, uploadData, userData), action(action), mark(Task::markCouter++) {
 
 }
 
@@ -439,14 +439,14 @@ void Excutor() {
 
 
 
-void Router::Get(const URL& url, Action* httpAction, void* userData /*= nullptr*/) {
+void Router::Get(const URL& url, Action* httpAction, Base* userData /*= nullptr*/) {
     if (std::find(std::begin(actionList), std::end(actionList), httpAction) != std::end(actionList)) {
         actionList.push_back(httpAction);
     }
     Run(Task(url, httpAction, userData));
 }
 
-void Router::Post(const URL& url, const std::vector<UploadedData>& uploadedDatas, Action* httpAction, void* userData /*= nullptr*/) {
+void Router::Post(const URL& url, const std::vector<UploadedData>& uploadedDatas, Action* httpAction, Base* userData /*= nullptr*/) {
     if (std::find(std::begin(actionList), std::end(actionList), httpAction) != std::end(actionList)) {
         actionList.push_back(httpAction);
     }

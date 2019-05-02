@@ -17,7 +17,12 @@
 namespace Http {
 typedef std::basic_string<char, std::char_traits<char>, std::allocator<char> > string;
 /*Memory used for storing response Content*/
-class NETWORK_API Memory {
+class NETWORK_API Base {
+public:
+    virtual ~Base() {}
+};
+
+class NETWORK_API Memory : public Base {
 public:
     Memory();
     Memory(const Memory& memory);
@@ -38,7 +43,7 @@ private:
 
 
 //name,value,type
-class  UploadedData {
+class  UploadedData : public Base {
 public:
     enum FIELD {
         STRING,
@@ -64,7 +69,7 @@ private:
 
 /*HTTP request*/
 //class TaskQueue;
-class  Request {
+class  Request : public Base {
 public:
     enum TYPE : int {
         GET = 0,
@@ -72,8 +77,8 @@ public:
     };
 public:
     NETWORK_API Request() = delete;
-    NETWORK_API Request(const URL& url, void* userData = nullptr);
-    NETWORK_API Request(const URL& url, const std::vector<UploadedData>& uploadeddatas, void* userData = nullptr);
+    NETWORK_API Request(const URL& url, Base* userData = nullptr);
+    NETWORK_API Request(const URL& url, const std::vector<UploadedData>& uploadeddatas, Base* userData = nullptr);
     NETWORK_API Request(const Request& request);
     NETWORK_API Request(Request&& request);
     NETWORK_API Request& operator=(const Request&) = delete;
@@ -86,16 +91,16 @@ public:
     NETWORK_API void Url(const URL& val);
     NETWORK_API void Unhandled(bool);
     NETWORK_API bool Unhandled() const;
-    NETWORK_API void* UserData() const;
-    NETWORK_API void UserData(void* val);
+    NETWORK_API Base* UserData() const;
+    NETWORK_API void UserData(Base* val);
     NETWORK_API std::vector<UploadedData>& Uploadeddatas();
     NETWORK_API Http::Request::TYPE Type() const;
     NETWORK_API void Type(Http::Request::TYPE val);
 protected:
     URL url;
     bool unhandled;
-    void* userData;
-    std::vector<UploadedData> uploadeddatas;
+    Base* userData;
+    std::vector<UploadedData> updDatas;
     TYPE type;
 };
 
@@ -132,8 +137,8 @@ public:
     Task() = delete;
     Task(const Task& task);
     Task(Task&& task);
-    Task(const URL& url, Action* action, void* userdata = nullptr);
-    Task(const URL& url, const std::vector<UploadedData>& uploadData, Action* action, void* userData = nullptr);
+    Task(const URL& url, Action* action, Base* userdata = nullptr);
+    Task(const URL& url, const std::vector<UploadedData>& uploadData, Action* action, Base* userData = nullptr);
     bool operator==(const Task& task)const;
     ~Task() {}
     //Setter and getter
@@ -149,26 +154,26 @@ private:
 };
 
 /*HTTP action for response from server, overload do func to perform action to response*/
-class NETWORK_API Action {
+class NETWORK_API Action : public Base {
 public:
     Action(): progressInterval(0.1), lastTime(0) {}
     virtual void Do(const Http::Task& task) = 0;
     virtual int Progress(double totaltime, double dltotal, double dlnow, double ultotal, double ulnow, const Http::Task& task) = 0;
     ~Action() {}
-    float ProgressInterval() const { return progressInterval; }
-    void ProgressInterval(float val) { progressInterval = val; }
+    double ProgressInterval() const { return progressInterval; }
+    void ProgressInterval(double val) { progressInterval = val; }
     float LastTime() const { return lastTime; }
     void LastTime(float val) { lastTime = val; }
 private:
-    float progressInterval;
+    double progressInterval;
     float lastTime;
 };
 
-class  Router {
+class  Router : public Base {
 public:
     NETWORK_API static  Router& GetInstance();
-    NETWORK_API void Get(const URL& url, Action* httpAction, void* userData = nullptr);
-    NETWORK_API void Post(const URL& url, const std::vector<UploadedData>& uploadedDatas, Action* httpAction, void* userData = nullptr);
+    NETWORK_API void Get(const URL& url, Action* httpAction, Base* userData = nullptr);
+    NETWORK_API void Post(const URL& url, const std::vector<UploadedData>& uploadedDatas, Action* httpAction, Base* userData = nullptr);
     NETWORK_API void Run(Task&& task);
     NETWORK_API ~Router();
     NETWORK_API Router(const Router& http) = delete;
