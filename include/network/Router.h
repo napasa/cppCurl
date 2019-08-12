@@ -50,9 +50,9 @@ public:
         FILE
     };
     NETWORK_API UploadedData() {}
-    NETWORK_API UploadedData(FIELD dataType, const std::string& key, const std::string& value);
-    NETWORK_API UploadedData(const UploadedData& postedData);
-    NETWORK_API UploadedData(UploadedData&& postedData);
+    NETWORK_API UploadedData(FIELD dataType, const std::string& key, const std::string& value, const std::string& filename = std::string());
+    NETWORK_API UploadedData(const UploadedData& uploadedData);
+    NETWORK_API UploadedData(UploadedData&& uploadedData);
     NETWORK_API UploadedData& operator=(const UploadedData& uploadData);
     NETWORK_API bool operator==(const UploadedData& postData)const;
     NETWORK_API FIELD Field() const;
@@ -61,10 +61,13 @@ public:
     NETWORK_API void Key(const std::string& val);
     NETWORK_API const std::string& Value()const;
     NETWORK_API void Value(const std::string& val);
+    NETWORK_API std::string FileName() const { return fileName; }
+    NETWORK_API void FileNames(std::string val) { fileName = val; }
 private:
     FIELD field;
     std::string key;
     std::string value;
+    std::string fileName;
 };
 
 /*HTTP request*/

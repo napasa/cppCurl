@@ -325,10 +325,17 @@ static void init(CURLM* cm) {
             } else {
                 opt = CURLformoption::CURLFORM_COPYCONTENTS;
             }
-            curl_formadd(&formpost, &lastptr,
-                         CURLFORM_COPYNAME, data.Key().c_str(),
-                         opt, data.Value().c_str(),
-                         CURLFORM_END);
+            if (data.FileName().empty()) {
+                curl_formadd(&formpost, &lastptr,
+                             CURLFORM_COPYNAME, data.Key().c_str(),
+                             opt, data.Value().c_str(),
+                             CURLFORM_END);
+            } else {
+                curl_formadd(&formpost, &lastptr,
+                             CURLFORM_COPYNAME, data.Key().c_str(),
+                             opt, data.Value().c_str(), CURLFORM_FILENAME, data.FileName().c_str(),
+                             CURLFORM_END);
+            }
         }
         headerlist = curl_slist_append(headerlist, buf);
         curl_easy_setopt(eh, CURLOPT_HTTPHEADER, headerlist);
@@ -477,28 +484,28 @@ void Router::ActionList(std::vector<Action*> val) {
     actionList = val;
 }
 
-UploadedData::UploadedData(FIELD dataType, const std::string& key, const std::string& value) : field(dataType), key(key), value(value) {
+UploadedData::UploadedData(FIELD dataType, const std::string& key, const std::string& value, const std::string& filename) : field(dataType), key(key), value(value), fileName(filename) {
 
 }
 
 
-UploadedData::UploadedData(const UploadedData& postedData) : field(postedData.field), key(postedData.key), value(postedData.value) {
+UploadedData::UploadedData(const UploadedData& uploadedData) : field(uploadedData.field), key(uploadedData.key), value(uploadedData.value), fileName(uploadedData.fileName) {
 
 }
 
-UploadedData::UploadedData(UploadedData&& postedData) : field(postedData.field), key(std::move(postedData.key)), value(std::move(postedData.value)) {
+UploadedData::UploadedData(UploadedData&& uploadedData) : field(uploadedData.field), key(std::move(uploadedData.key)), value(std::move(uploadedData.value)), fileName(uploadedData.fileName) {
 
 }
 
 
-UploadedData& UploadedData::operator=(const UploadedData& uploadData) {
-    field = uploadData.Field();
-    key = uploadData.Key(), value = uploadData.Value();
+UploadedData& UploadedData::operator=(const UploadedData& uploadedData) {
+    field = uploadedData.Field();
+    key = uploadedData.Key(), value = uploadedData.Value(), fileName = uploadedData.fileName;
     return *this;
 }
 
-bool UploadedData::operator==(const UploadedData& postData) const {
-    return field == postData.field && key == postData.key && value == postData.value;
+bool UploadedData::operator==(const UploadedData& uploadedData) const {
+    return field == uploadedData.field && key == uploadedData.key && value == uploadedData.value && fileName == uploadedData.fileName;
 }
 
 UploadedData::FIELD UploadedData::Field() const {
