@@ -181,10 +181,7 @@ public:
     NETWORK_API ~Router();
     NETWORK_API Router(const Router& http) = delete;
     NETWORK_API Router& operator=(const Router&) = delete;
-    NETWORK_API std::vector<Action*> ActionList() const;
-    NETWORK_API void ActionList(std::vector<Action*> val);
 private:
-    std::vector<Action*> actionList;
     Router() {}
 };
 

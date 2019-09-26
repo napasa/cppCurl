@@ -447,16 +447,10 @@ void Excutor() {
 
 
 void Router::Get(const URL& url, Action* httpAction, Base* userData /*= nullptr*/) {
-    if (std::find(std::begin(actionList), std::end(actionList), httpAction) != std::end(actionList)) {
-        actionList.push_back(httpAction);
-    }
     Run(Task(url, httpAction, userData));
 }
 
 void Router::Post(const URL& url, const std::vector<UploadedData>& uploadedDatas, Action* httpAction, Base* userData /*= nullptr*/) {
-    if (std::find(std::begin(actionList), std::end(actionList), httpAction) != std::end(actionList)) {
-        actionList.push_back(httpAction);
-    }
     Run(Task(url, uploadedDatas, httpAction, userData));
 }
 
@@ -470,18 +464,6 @@ void Router::Run(Task&& task) {
 }
 
 Router::~Router() {
-    std::for_each(std::begin(actionList), std::end(actionList), [](Action * action) {
-        delete action;
-    });
-}
-
-
-std::vector<Action*> Router::ActionList() const {
-    return actionList;
-}
-
-void Router::ActionList(std::vector<Action*> val) {
-    actionList = val;
 }
 
 UploadedData::UploadedData(FIELD dataType, const std::string& key, const std::string& value, const std::string& filename) : field(dataType), key(key), value(value), fileName(filename) {
